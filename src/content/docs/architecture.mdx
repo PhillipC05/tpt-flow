@@ -1,0 +1,123 @@
+---
+title: Technical Architecture
+description: Chain-agnostic protocol description. Stack layers, ZK identity integration points, and key design constraints.
+order: 2
+---
+
+# Technical Architecture
+
+TPT Flow is designed as a chain-agnostic protocol. The mechanics are specified at the protocol level; the blockchain layer is an implementation detail that can be instantiated on any EVM-compatible or sufficiently programmable chain.
+
+---
+
+## Stack Overview
+
+| Layer | Purpose |
+|---|---|
+| **Blockchain Layer** | Token issuance, demurrage enforcement, accumulation cap logic, commons pool. Requires: programmable balance decay, low gas costs, EVM compatibility preferred. |
+| **Smart Contracts** | Demurrage logic, caps, commons distribution, governance votes. Core mechanics in audited, formally verified contracts. |
+| **Identity Layer** | Zero-knowledge proof identity. Verifies unique humans without personal data on-chain. Required for: one-person-one-vote governance, Sybil-resistant commons distribution. |
+| **Wallet & UX** | Mobile-first PWA. Offline-capable for emerging market users. Send/receive/demurrage display. |
+| **Merchant API** | REST API for merchant integration. QR code payments. Webhooks. SDKs for common e-commerce platforms. |
+| **Exchange Layer** | Controlled, rate-limited fiat on/off ramp. Deliberate friction on conversion to discourage speculation. |
+
+---
+
+## Blockchain Layer Requirements
+
+Any chain used to run TPT Flow must meet the following requirements:
+
+| Requirement | Why |
+|---|---|
+| Programmable token balance decay | Demurrage requires time-weighted balance calculations — cannot be done with a standard ERC-20 |
+| Low per-transaction gas cost | High-frequency small transactions (the goal) must be economically viable |
+| Smart contract upgradability pattern | Core mechanics are immutable; governance parameters require upgrade path |
+| EVM compatibility (preferred) | Largest developer ecosystem, most tooling, most audited contract patterns |
+| ZK identity integration | Requires on-chain verification of ZK proofs |
+| Transaction throughput > 100 TPS | Required to handle a network of 50,000+ active wallets |
+
+See [docs/chains](/docs/chains) for a comparison of candidate chains against these requirements.
+
+---
+
+## Demurrage Implementation
+
+Demurrage is implemented at the smart contract level using a time-weighted balance decay function.
+
+**Algorithm:**
+1. On-chain timestamp records last-activity time per wallet.
+2. Each transaction triggers `applyDemurrage(wallet, currentTimestamp)`.
+3. Elapsed months since last activity × applicable rate × balance above free tier = demurrage charge.
+4. Escalating rate applies to balance above soft cap.
+5. Hard cap overflow redirects to commons pool.
+
+**Key property:** Demurrage is applied lazily — only when a transaction occurs on the wallet. This avoids the need for a global state sweep each period, which would be prohibitively expensive on-chain.
+
+```solidity
+// Pseudocode — not final implementation
+function applyDemurrage(address wallet) internal {
+    uint256 elapsed = block.timestamp - lastActivity[wallet];
+    uint256 months = elapsed / SECONDS_PER_MONTH;
+    if (months == 0) return;
+
+    uint256 balance = balances[wallet];
+    uint256 freeTier = params.freeTierAmount;
+    if (balance <= freeTier) return;
+
+    uint256 taxable = balance - freeTier;
+    uint256 charge = calculateCharge(taxable, months, params);
+
+    balances[wallet] -= charge;
+    commonsPool += charge;
+    lastActivity[wallet] = block.timestamp;
+}
+```
+
+---
+
+## Identity Layer
+
+One-person-one-vote governance requires Sybil resistance — preventing one person from controlling many wallets to acquire disproportionate voting power.
+
+**Requirements for the ZK identity protocol:**
+- Proves unique human identity without revealing personal data
+- Cannot be transferred or sold (credential is bound to biometric or equivalent)
+- Globally accessible (does not require national identity infrastructure)
+- Revocable (if a credential is compromised, it can be invalidated)
+- ZK proof verifiable on-chain at low gas cost
+
+**Candidate protocols (evaluation deferred to contract phase):**
+
+| Protocol | Mechanism | Concern |
+|---|---|---|
+| Worldcoin ZK | Iris biometric → ZK proof of unique human | Centralised iris scan infrastructure; geographic rollout limitations |
+| Proof of Humanity | Social vouching + video | Vulnerable to collusion in small networks |
+| Anon Aadhaar | India's Aadhaar system with ZK layer | India-specific; not globally accessible |
+| Custom vouching | Web-of-trust with ZK commitment | Scalability and bootstrap challenges |
+
+Identity provider selection is deferred to the smart contract phase. The protocol specifies the interface requirements; the provider is a pluggable module.
+
+---
+
+## Governance Contract
+
+The governance contract enforces:
+- Proposal submission (any verified identity)
+- Discussion period (minimum 7 days)
+- Voting (one verified identity = one vote)
+- Time-lock before execution (48 hours)
+- Parameter bounds validation (cannot set outside immutable bounds)
+- Core mechanics immutability (demurrage existence, commons existence, one-person-one-vote)
+
+See [docs/governance](/docs/governance) for the full governance specification.
+
+---
+
+## Security Design Principles
+
+- Core contracts are immutable — no admin key, no upgrade path for the core mechanics
+- Governance parameter contracts use a time-lock upgrade pattern
+- Commons pool is protected by multi-sig until governance is live
+- All contracts formally verified and independently audited before mainnet deployment
+- Phased rollout with value caps: Phase 1 limits total network value to reduce exploit incentive
+- Bug bounty programme active from testnet deployment

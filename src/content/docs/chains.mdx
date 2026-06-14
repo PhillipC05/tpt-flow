@@ -1,0 +1,80 @@
+---
+title: Chain Comparison
+description: Evaluation of candidate blockchains against TPT Flow requirements. No chain committed at concept stage.
+order: 3
+---
+
+# Chain Comparison
+
+TPT Flow is designed as a chain-agnostic protocol. No blockchain has been selected yet — this decision is deliberately deferred until the economic simulation has validated parameter ranges and the pilot community context is known.
+
+This document evaluates candidate chains against the requirements defined in [architecture](/docs/architecture).
+
+---
+
+## Requirements Recap
+
+| Requirement | Priority |
+|---|---|
+| Programmable balance decay (demurrage) | Critical |
+| Low per-transaction gas cost | Critical |
+| EVM / Solidity tooling | High |
+| ZK identity proof verification | High |
+| Transaction throughput > 100 TPS | High |
+| Multi-ramp fiat on/off capability | Medium |
+| Developer ecosystem maturity | Medium |
+| Decentralisation / censorship resistance | Medium |
+
+---
+
+## Candidate Chain Comparison
+
+| Chain | Gas Cost | EVM? | ZK Support | TPS | Fiat Ramps | Notes |
+|---|---|---|---|---|---|---|
+| **Base** (Coinbase L2) | Very low | Yes | Good | ~2,000 | Excellent (Coinbase integration) | Largest L2 by TVL; Coinbase's built-in on-ramp simplifies one ramp but creates dependency |
+| **Arbitrum One** | Very low | Yes | Good | ~4,000 | Multiple third-party | Mature, large ecosystem, high decentralisation |
+| **Optimism** | Very low | Yes | Good | ~2,000 | Multiple third-party | OP Stack shared with Base; strong governance tooling |
+| **Polygon zkEVM** | Low | Yes | Native ZK | ~2,000 | Multiple | ZK rollup — ZK proofs cheaper to verify; less ecosystem maturity |
+| **Starknet** | Low | Via transpile | Native ZK | ~2,000 | Limited | Best-in-class ZK; Cairo language, not Solidity — smaller dev ecosystem |
+| **Cosmos App-chain** | Configurable | No | Requires custom | Configurable | Complex | Maximum control over economics; significant infrastructure overhead to operate |
+
+---
+
+## Recommendation (Provisional)
+
+An **Ethereum L2** is the most pragmatic choice at this stage:
+
+- Solidity tooling ecosystem is the largest and most audited
+- ZK identity protocols (Worldcoin, Proof of Humanity) already have EVM integrations
+- Multiple fiat ramp providers available on all major L2s — avoids single-ramp dependency
+
+**Multi-ramp is a design requirement.** Single-ramp dependency (e.g. Base-only) creates a point of failure and a centralisation risk. The exchange layer must abstract over multiple ramp providers.
+
+Between Base, Arbitrum, and Optimism, the choice is primarily about:
+- Coinbase dependency (Base: higher ramp convenience, higher centralisation risk)
+- Governance tooling (Optimism: Superchain governance tooling available)
+- Ecosystem size (Arbitrum: currently largest L2 by TVL and developer activity)
+
+**Decision deferred** to the contract phase after:
+1. Pilot community context is known (affects preferred fiat ramp geography)
+2. ZK identity provider is selected (affects ZK proof verification cost comparison)
+3. Economic simulation confirms likely transaction volume
+
+---
+
+## Why Not a Purpose-Built App-Chain?
+
+A Cosmos app-chain would offer maximum control over block times, gas economics, and consensus. The tradeoffs at this stage:
+
+- **Tooling overhead:** No existing Solidity contracts to fork; must build from scratch in Go or Rust
+- **Developer ecosystem:** Significantly smaller talent pool than EVM
+- **ZK identity:** No existing ZK identity protocol with Cosmos integration at production quality
+- **Infrastructure:** Must operate your own validator set and manage chain security
+
+An app-chain may become the right answer at Phase 3 scale. It is not the right answer for Phase 1.
+
+---
+
+## Why Not an Existing DeFi Protocol?
+
+Existing DeFi infrastructure (Uniswap, Aave, etc.) is designed around free convertibility and speculative incentives — the exact problem TPT Flow is designed to avoid. Using an existing DeFi stack would require overriding its core assumptions, which is more complex and fragile than building the narrow set of mechanics TPT Flow requires.

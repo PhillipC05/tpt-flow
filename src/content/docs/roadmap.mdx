@@ -1,0 +1,135 @@
+---
+title: Detailed Roadmap
+description: Phase-by-phase milestones, dependencies, and success criteria.
+order: 5
+---
+
+# Detailed Roadmap
+
+---
+
+## Phase 0 — Concept & Simulation (Active)
+
+**Goal:** Build the intellectual and technical foundation. Validate economic mechanics through simulation before writing a single contract.
+
+### Milestones
+
+- [x] Executive summary and whitepaper
+- [x] Documentation site
+- [x] Economic simulation / parameter modeller
+- [ ] Legal structure review (NZ/AU crypto-specialist firm)
+- [ ] Identify pilot community candidate
+- [ ] Commission economic modelling (external firm)
+- [ ] Governance specification finalised
+
+### Success Criteria
+
+- Simulation demonstrates that velocity increases and Gini coefficient decreases under demurrage configurations in the 0.5–1%/month range
+- At least one pilot community candidate identified and in discussion
+- Legal structure confirmed (likely: non-profit protocol foundation)
+
+---
+
+## Phase 1 — Closed Network Pilot
+
+**Goal:** Launch within a defined economic network where trust already exists. Prove that velocity mechanics work in a real community and that accumulation limits don't kill participation.
+
+**Prerequisite:** Pilot community identified, legal structure confirmed, smart contract architecture review complete.
+
+### Milestones
+
+- [ ] Smart contract architecture review (external security firm)
+- [ ] Core contracts written (demurrage, accumulation caps, commons pool)
+- [ ] Testnet deployment
+- [ ] ZK identity integration (provider selected and integrated)
+- [ ] Independent security audit (multiple firms)
+- [ ] Formal verification of core contracts
+- [ ] Pilot community onboarded (minimum 100 participants pre-committed)
+- [ ] Basic wallet PWA (send/receive/demurrage display)
+- [ ] Mainnet deployment with Phase 1 value cap
+- [ ] Governance portal (basic parameter voting)
+
+### Target Scale
+- 500–2,000 active wallets
+- Minimum 3-month pilot period before expansion
+
+### Success Criteria
+- Average transaction frequency ≥ 2× per participant per month (velocity)
+- Gini coefficient for the pilot network ≤ 0.5 after 3 months
+- No security incidents
+- Net Promoter Score ≥ +30 from pilot participants
+
+---
+
+## Phase 2 — Network Expansion
+
+**Goal:** Open to adjacent networks. Build merchant acceptance. Establish live governance with verified-human voting.
+
+**Prerequisite:** Phase 1 success criteria met, governance portal production-ready.
+
+### Milestones
+
+- [ ] Open to adjacent communities (adjacent = shared trust with Phase 1 network)
+- [ ] Public merchant API with documentation
+- [ ] SDKs for common e-commerce platforms (WooCommerce, Shopify, Stripe-compatible)
+- [ ] Governance portal with full verified-human voting
+- [ ] Multi-ramp fiat on/off (minimum 2 independent ramp providers)
+- [ ] Mobile wallet improved (offline capability, push notifications)
+- [ ] Protocol economic reporting (public dashboard: velocity, Gini, commons pool)
+
+### Target Scale
+- 10,000–50,000 active wallets
+- Minimum 5 independent merchant categories accepting TPT Flow
+
+### Success Criteria
+- Money velocity maintained or increased from Phase 1 baseline
+- Governance has passed at least one parameter adjustment by verified-human vote
+- No plutocratic capture events (no single wallet > hard cap, governance vote distribution healthy)
+
+---
+
+## Phase 3 — Global Layer
+
+**Goal:** Open protocol. Global mobile wallet. Focus on emerging markets where banking exclusion is highest.
+
+**Prerequisite:** Phase 2 governance mature, protocol economically stable.
+
+### Milestones
+
+- [ ] Protocol governance transferred to community (founding team multi-sig retired)
+- [ ] Open protocol with public specification
+- [ ] Global mobile wallet (offline-capable, translated to top 10 languages by speaker count)
+- [ ] Remittance corridor integrations (top 5 corridors by volume)
+- [ ] Multiple fiat ramp integrations across geographies
+- [ ] App-chain evaluation (if transaction volumes exceed current L2 capacity)
+
+### Target Scale
+- 500,000+ active wallets
+- Present in minimum 20 countries
+
+---
+
+## Dependencies Map
+
+```
+Phase 0: simulation validates parameters
+    ↓
+Phase 0: pilot community identified
+    ↓
+Phase 1: legal structure + security audit
+    ↓
+Phase 1: contracts deployed + governance live
+    ↓
+Phase 2: merchant API + multi-ramp
+    ↓
+Phase 3: open protocol + global wallet
+```
+
+---
+
+## What Is Not On This Roadmap
+
+- **DeFi integration:** Connecting TPT Flow to DeFi yield protocols would recreate speculation incentives. Not planned.
+- **NFT functionality:** Not a use case for a velocity-focused currency.
+- **Cross-chain bridging:** Bridges create arbitrage vectors. If multi-chain deployment occurs, each chain instance is independent.
+- **Stablecoin peg:** TPT Flow is not pegged to any asset. Its value is determined by the real-economy network it enables, not a peg mechanism.

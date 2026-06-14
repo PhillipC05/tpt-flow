@@ -1,0 +1,117 @@
+---
+title: Economic Parameters
+description: All configurable parameters — demurrage rate, free tier, accumulation caps, and commons formula — with rationale and suggested ranges.
+order: 1
+---
+
+# Economic Parameters
+
+All TPT Flow economic parameters are governance-adjustable within bounded ranges set at contract launch. Core mechanics are immutable; parameters are not.
+
+---
+
+## Demurrage Rate
+
+**Type:** Percentage per month  
+**Suggested range:** 0.1% – 5% per month  
+**Suggested starting point:** 0.5–1% per month
+
+The holding cost applied to wallet balances above the free tier per calendar month. Applied via time-weighted decay: if a wallet holds 1,000 TPT for 15 days at 1%/month, the charge is approximately 5 TPT (pro-rated).
+
+**Rationale:** Rate must be high enough to create a meaningful incentive to transact, but low enough that it doesn't create panic selling or destroy saving behaviour entirely. Empirical evidence from Gesell experiments and simulation modelling suggests 0.5–1%/month strikes this balance for most network sizes.
+
+**Governance bound:** Cannot be set below 0.1% (which would effectively disable demurrage) or above 5% (which would be destructive to participation).
+
+---
+
+## Free Tier Amount
+
+**Type:** TPT balance  
+**Suggested range:** 0 – 500 TPT  
+**Suggested starting point:** 100 TPT
+
+The balance below which no demurrage is charged. Every wallet can hold up to this amount indefinitely without cost. Ensures small and low-income participants are not penalised.
+
+**Rationale:** Without a free tier, demurrage becomes regressive — it hits small wallets proportionally harder. The free tier should approximate a reasonable working balance for a typical participant (roughly 1–2 weeks of spending).
+
+**Governance bound:** Cannot exceed 500 TPT to ensure demurrage still applies meaningfully to median participants.
+
+---
+
+## Soft Cap Multiplier
+
+**Type:** Multiple of mean wallet balance  
+**Suggested range:** 2× – 10×  
+**Suggested starting point:** 5×
+
+The soft cap is calculated dynamically as `softCapMultiplier × mean(all wallet balances)`. Balances above the soft cap attract escalating demurrage — the rate increases progressively as the balance rises further above the cap.
+
+**Rationale:** Expressed as a multiple rather than a fixed amount, so it scales with the size and activity of the network. A fixed cap would become irrelevant as the network grows and nominal balances rise.
+
+**Governance bound:** Must be at least 2× (to avoid penalising active, successful participants) and no more than 10× (to ensure meaningful accumulation limits).
+
+---
+
+## Hard Cap Multiplier
+
+**Type:** Multiple of mean wallet balance  
+**Suggested range:** Soft cap multiplier + 1× to 20×  
+**Suggested starting point:** 10×
+
+The hard cap is `hardCapMultiplier × mean(all wallet balances)`. Any balance exceeding the hard cap is automatically redirected to the commons pool — not burned, not destroyed. The wallet simply cannot hold more than the hard cap.
+
+**Rationale:** The hard cap is the protocol-level commitment that accumulation truly has a ceiling. The soft cap creates incentives to spend; the hard cap enforces the ceiling regardless of intent.
+
+**Governance bound:** Must exceed the soft cap multiplier by at least 1×. Cannot exceed 20× mean balance.
+
+---
+
+## Soft Cap Surcharge Multiplier
+
+**Type:** Rate multiplier (applied above soft cap)  
+**Suggested range:** 1.5× – 10× standard demurrage rate  
+**Suggested starting point:** 3×
+
+The rate applied to balances between the soft cap and the hard cap. If the standard demurrage rate is 1%/month, and the surcharge multiplier is 3×, then balances above the soft cap attract 3%/month.
+
+**Rationale:** Creates a graduated incentive curve rather than a binary threshold. Participants above the soft cap face increasing costs the longer they hold, making spending progressively more attractive.
+
+---
+
+## Commons Distribution Formula
+
+**Type:** Enum  
+**Options:** `proportional` | `uniform` | `hybrid`  
+**Suggested starting point:** `proportional`
+
+Determines how the commons pool is distributed each period to verified participants.
+
+| Formula | Logic | Trade-off |
+|---|---|---|
+| `proportional` | Weight = transaction count in the period. Higher-frequency participants receive more. | Incentivises activity; may disadvantage low-volume but legitimate participants |
+| `uniform` | Equal split per verified participant. | Simple and egalitarian; does not reward activity |
+| `hybrid` | Weighted blend of proportional and uniform, with a configurable blend ratio. | Balances incentives and baseline distribution |
+
+**Governance:** The formula type, and the blend ratio for `hybrid`, are governance-adjustable.
+
+---
+
+## Distribution Period
+
+**Type:** Blocks or time interval  
+**Suggested range:** Daily – Monthly  
+**Suggested starting point:** Monthly (aligned with demurrage charge cycle)
+
+How frequently the commons pool distributes to verified participants. More frequent distribution increases activity incentives but also gas costs for on-chain distribution.
+
+---
+
+## Convertibility Parameters
+
+The convertibility model is unresolved at concept stage — [see the open questions](/docs/governance#open-questions). Parameters will be defined when the model is selected. Three candidate models:
+
+- **Time-locked exits:** Conversion to fiat requires a lock-in period (e.g. 30 days). Prevents arbitrage while preserving eventual liquidity.
+- **Rate-limited exchange:** Capped conversion per wallet per month. Prevents large-scale arbitrage; enables real-economy cash-outs.
+- **Community-controlled pool:** Rate and volume governed by verified-human vote.
+
+**Governance bound:** Convertibility parameters are governance-adjustable within bounds set at launch. The existence of some friction on conversion is immutable — free convertibility would recreate speculation incentives.

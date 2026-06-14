@@ -1,0 +1,132 @@
+---
+title: Merchant API (Planned)
+description: Future REST API reference for merchant integration — QR payments, webhooks, and SDK overview.
+order: 6
+---
+
+# Merchant API
+
+> **Status:** Planned — Phase 2 deliverable. This document describes the intended API design; no implementation exists yet.
+
+---
+
+## Overview
+
+The Merchant API allows businesses to accept TPT Flow payments without managing smart contract interactions directly. It abstracts over wallet management, transaction signing, and on-chain state reading.
+
+---
+
+## Authentication
+
+API keys are issued per merchant account. Pass in the `Authorization` header:
+
+```http
+Authorization: Bearer tptflow_live_xxxxxxxxxxxx
+```
+
+Test keys use the `tptflow_test_` prefix and operate against testnet.
+
+---
+
+## Endpoints (Planned)
+
+### Create Payment Request
+
+```http
+POST /v1/payments
+```
+
+```json
+{
+  "amount": 25.50,
+  "currency": "TPT",
+  "reference": "order_abc123",
+  "expires_in": 300,
+  "webhook_url": "https://yourapp.com/webhooks/tptflow"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "pay_xxxxxxxxxxxx",
+  "qr_code_url": "https://api.tptflow.io/qr/pay_xxx",
+  "deep_link": "tptflow://pay/pay_xxx",
+  "expires_at": "2025-01-01T12:05:00Z",
+  "status": "pending"
+}
+```
+
+---
+
+### Get Payment Status
+
+```http
+GET /v1/payments/{id}
+```
+
+```json
+{
+  "id": "pay_xxxxxxxxxxxx",
+  "status": "completed",
+  "amount": 25.50,
+  "from_wallet": "0x...",
+  "tx_hash": "0x...",
+  "completed_at": "2025-01-01T12:02:34Z"
+}
+```
+
+---
+
+### Webhook Events
+
+TPT Flow sends a POST to your `webhook_url` for the following events:
+
+| Event | Trigger |
+|---|---|
+| `payment.completed` | Payment confirmed on-chain |
+| `payment.expired` | Payment request expired without completion |
+| `payment.failed` | Transaction failed (insufficient balance, etc.) |
+
+**Webhook payload:**
+```json
+{
+  "event": "payment.completed",
+  "data": {
+    "id": "pay_xxxxxxxxxxxx",
+    "amount": 25.50,
+    "reference": "order_abc123"
+  },
+  "timestamp": "2025-01-01T12:02:34Z",
+  "signature": "sha256=xxxx"
+}
+```
+
+Verify the signature using your webhook secret to confirm the request is from TPT Flow.
+
+---
+
+## SDKs (Planned)
+
+| Platform | Status |
+|---|---|
+| Node.js / TypeScript | Planned — Phase 2 |
+| PHP (WooCommerce) | Planned — Phase 2 |
+| Python | Planned — Phase 2 |
+| Shopify App | Planned — Phase 2 |
+
+---
+
+## Rate Limits (Provisional)
+
+| Tier | Requests / minute |
+|---|---|
+| Developer (test) | 60 |
+| Standard | 300 |
+| Enterprise | Custom |
+
+---
+
+## Fiat On/Off Ramp API
+
+Documentation for the fiat conversion layer will be added when the convertibility model is finalised. See [governance/open-questions](/docs/governance#open-questions) for the current status.

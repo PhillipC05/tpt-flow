@@ -1,0 +1,124 @@
+---
+title: Governance Specification
+description: Full governance spec — identity requirements, proposal process, parameter bounds, immutable mechanics, and emergency procedures.
+order: 4
+---
+
+# Governance Specification
+
+This document is the authoritative specification for TPT Flow governance. The [governance public page](/governance) is a summary.
+
+---
+
+## Design Principles
+
+1. **Governance cannot recreate the problem it is solving.** Token-weighted voting is prohibited. Voting power is strictly one-person-one-vote.
+2. **Core mechanics are immutable.** No governance action can disable demurrage, eliminate the commons pool, or change the voting model.
+3. **Parameters are bounded.** Governance can adjust parameters only within ranges set at launch. Bounds are immutable.
+4. **Deliberation is mandatory.** No parameter can change without a minimum discussion period. Flash governance is structurally impossible.
+
+---
+
+## Identity Requirements
+
+Participation in governance requires a verified identity credential. Requirements for the identity protocol:
+
+- **Sybil resistance:** One credential per unique human. Cannot be duplicated.
+- **Privacy:** No personal data stored on-chain. ZK proof only.
+- **Transferability:** Credentials cannot be transferred or sold. Bound to the originating person.
+- **Revocability:** Compromised credentials can be invalidated without affecting the holder's ability to obtain a new one.
+- **Global accessibility:** Must be obtainable without national identity documents.
+
+Identity provider selection is deferred to the contract phase. See [architecture/identity](/docs/architecture#identity-layer) for candidate protocols.
+
+---
+
+## Governance Token
+
+There is no governance token. Voting rights derive from verified identity, not token holdings. This is immutable.
+
+---
+
+## Proposal Process
+
+### Eligibility
+Any verified participant may submit a proposal. Proposals must specify:
+- The parameter to be changed
+- The proposed new value
+- Rationale (minimum 100 words)
+- Evidence or simulation results supporting the change
+
+### Timeline
+
+| Stage | Duration | Notes |
+|---|---|---|
+| Discussion | Minimum 7 days | Open comment period. Proposer must respond to substantive objections. |
+| Voting | 7 days | One-person-one-vote. Vote is binary: accept / reject. |
+| Time-lock | 48 hours | Passed proposals enter time-lock. Participants can exit or prepare during this window. |
+| Execution | Automatic | Smart contract executes change at time-lock expiry if not vetoed. |
+
+### Quorum
+- **Minor adjustments** (change within 20% of current value): 10% of verified participants must vote.
+- **Major adjustments** (change exceeding 20% of current value): 25% of verified participants must vote.
+- **Supermajority threshold:** 67% approval required for all parameter changes.
+
+### Veto
+During the time-lock, a supermajority (75%) of verified participants can veto a passed proposal. This is a safeguard against governance attacks that pass by thin margins.
+
+---
+
+## Immutable Core Mechanics
+
+The following cannot be changed by any governance action:
+
+| Mechanic | Constraint |
+|---|---|
+| Demurrage exists | The demurrage mechanism cannot be disabled |
+| Demurrage rate minimum | Cannot be set to 0 (minimum: 0.1%/month) |
+| Commons pool exists | The pool cannot be eliminated |
+| Commons distribution occurs | Distribution must occur at least monthly |
+| One-person-one-vote | Voting model cannot be changed |
+| Parameter bounds | The bounds on all adjustable parameters cannot be widened |
+
+---
+
+## Adjustable Parameters and Bounds
+
+| Parameter | Min | Max | Default | Notes |
+|---|---|---|---|---|
+| Demurrage rate | 0.1%/mo | 5%/mo | 1%/mo | |
+| Free tier amount | 0 TPT | 500 TPT | 100 TPT | |
+| Soft cap multiplier | 2× | 10× | 5× | Of mean wallet balance |
+| Hard cap multiplier | Soft cap + 1× | 20× | 10× | Must exceed soft cap |
+| Soft cap surcharge | 1.5× standard | 10× standard | 3× standard | |
+| Commons formula | — | — | proportional | Must be one of three valid types |
+| Hybrid blend ratio | 0 | 100% | 50% | Only applies if formula = hybrid |
+| Distribution period | Daily | Monthly | Monthly | |
+| Convertibility lock | 7 days | 365 days | 30 days | If time-locked model selected |
+| Conversion monthly cap | 10 TPT | 10,000 TPT | 500 TPT | If rate-limited model selected |
+
+---
+
+## Emergency Procedures
+
+### Protocol Pause
+In the event of a critical security vulnerability, a multi-sig of the founding team can pause the protocol for up to 72 hours. The pause:
+- Halts all transactions
+- Does not affect balances
+- Automatically expires at 72 hours with no extensions possible
+
+After the 72-hour window, the protocol resumes. Any ongoing vulnerability must be addressed by governance proposal.
+
+### Security Council
+A security council of 5 independent, publicly identified individuals can veto any governance-approved change if they unanimously determine it constitutes a critical protocol risk. Security council members are elected by governance annually.
+
+---
+
+## Open Questions
+
+The following governance-related design questions are unresolved at concept stage:
+
+- **Convertibility model:** Time-locked / rate-limited / community-pool? Each implies different governance parameters. Use the [simulation tool](/simulate) to model outcomes.
+- **Identity provider:** Specific ZK protocol for Sybil-resistant identity. Deferred to contract phase.
+- **Initial governance bootstrapping:** Who votes in Phase 1 when there are few verified participants? Founding team multi-sig acts as governance proxy until a minimum of 100 verified participants are active.
+- **Cross-network governance:** If TPT Flow runs on multiple chains simultaneously, how are governance votes unified?
