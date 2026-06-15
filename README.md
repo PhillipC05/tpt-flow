@@ -68,4 +68,4 @@ Phase 0 — concept and simulation. No smart contracts exist yet. See the [Roadm
 
 ## Licence
 
-All rights reserved. This repository is public for review and comment only.
+MIT — see [LICENSE](LICENSE).

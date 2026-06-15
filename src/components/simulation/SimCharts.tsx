@@ -45,6 +45,9 @@ export function SimCharts({ snapshots, compareSnapshots }: Props) {
     velocityB: compareSnapshots?.[i] ? +compareSnapshots[i].velocity.toFixed(4) : undefined,
     giniB: compareSnapshots?.[i] ? +compareSnapshots[i].giniCoefficient.toFixed(4) : undefined,
     commonsB: compareSnapshots?.[i] ? +compareSnapshots[i].commonsPoolSize.toFixed(2) : undefined,
+    p50B: compareSnapshots?.[i] ? +compareSnapshots[i].wealthPercentiles[2].toFixed(2) : undefined,
+    p90B: compareSnapshots?.[i] ? +compareSnapshots[i].wealthPercentiles[4].toFixed(2) : undefined,
+    p10B: compareSnapshots?.[i] ? +compareSnapshots[i].wealthPercentiles[0].toFixed(2) : undefined,
   }));
 
   return (
@@ -103,9 +106,12 @@ export function SimCharts({ snapshots, compareSnapshots }: Props) {
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip formatter={(v) => (typeof v === "number" ? v.toFixed(1) : v)} />
             <Legend />
-            <Line type="monotone" dataKey="p90" name="90th percentile" stroke="hsl(220 50% 55%)" dot={false} strokeWidth={1.5} />
+            <Line type="monotone" dataKey="p90" name="90th pct" stroke="hsl(220 50% 55%)" dot={false} strokeWidth={1.5} />
             <Line type="monotone" dataKey="p50" name="Median" stroke={STROKE_A} dot={false} strokeWidth={2} />
-            <Line type="monotone" dataKey="p10" name="10th percentile" stroke="hsl(30 70% 55%)" dot={false} strokeWidth={1.5} />
+            <Line type="monotone" dataKey="p10" name="10th pct" stroke="hsl(30 70% 55%)" dot={false} strokeWidth={1.5} />
+            {compareSnapshots && <Line type="monotone" dataKey="p90B" name="90th pct (B)" stroke="hsl(220 50% 55%)" dot={false} strokeWidth={1.5} strokeDasharray="5 3" />}
+            {compareSnapshots && <Line type="monotone" dataKey="p50B" name="Median (B)" stroke={STROKE_B} dot={false} strokeWidth={2} strokeDasharray="5 3" />}
+            {compareSnapshots && <Line type="monotone" dataKey="p10B" name="10th pct (B)" stroke="hsl(30 70% 55%)" dot={false} strokeWidth={1.5} strokeDasharray="5 3" />}
           </LineChart>
         </ResponsiveContainer>
       </ChartCard>

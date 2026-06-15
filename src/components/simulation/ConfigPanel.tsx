@@ -33,6 +33,10 @@ function num(v: number | readonly number[]): number {
 }
 
 export function ConfigPanel({ config, onChange, onRun, onReset, running }: Props) {
+  const approxMean = config.totalSupply / config.agents;
+  const approxSoftCap = Math.round(approxMean * config.softCapMultiplier);
+  const approxHardCap = Math.round(approxMean * config.hardCapMultiplier);
+
   return (
     <div className="space-y-6">
       {/* Presets */}
@@ -88,7 +92,7 @@ export function ConfigPanel({ config, onChange, onRun, onReset, running }: Props
         <div className="space-y-4">
           <Row
             label="Soft Cap Multiplier"
-            hint={`${config.softCapMultiplier}× mean balance`}
+            hint={`${config.softCapMultiplier}× mean (~${approxSoftCap} TPT)`}
           >
             <Slider
               aria-label="Soft Cap Multiplier"
@@ -99,7 +103,7 @@ export function ConfigPanel({ config, onChange, onRun, onReset, running }: Props
           </Row>
           <Row
             label="Hard Cap Multiplier"
-            hint={`${config.hardCapMultiplier}× mean balance`}
+            hint={`${config.hardCapMultiplier}× mean (~${approxHardCap} TPT)`}
           >
             <Slider
               aria-label="Hard Cap Multiplier"

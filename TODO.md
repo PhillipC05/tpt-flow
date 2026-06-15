@@ -148,7 +148,7 @@
 - [x] `.dockerignore` — exclude node_modules, .next, .git
 - [x] Health check endpoint (`/api/health`)
 - [ ] Test `docker-compose up --build` locally
-- [ ] Document VPS setup steps (SSL, env vars, domain config)
+- [x] Document VPS setup steps (SSL, env vars, domain config) — see `docs/vps-setup.md`
 
 ---
 
@@ -156,9 +156,9 @@
 
 ### Testing
 - [x] Unit tests for all simulation engine modules (`*.test.ts`)
-- [ ] Verify demurrage mechanics produce expected economic outcomes (velocity up, Gini down)
-- [ ] Test comparison mode with identical configs produces identical results
-- [ ] Test edge cases: all balances below free tier, all balances above hard cap, zero transactions
+- [x] Verify demurrage mechanics produce expected economic outcomes (velocity up, Gini down)
+- [x] Test comparison mode with identical configs produces identical results
+- [x] Test edge cases: all balances below free tier, all balances above hard cap, zero transactions
 
 ### UI Improvements
 - [x] Web Worker for simulation computation (non-blocking on large agent counts)
